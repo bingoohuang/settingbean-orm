@@ -37,86 +37,71 @@ CREATE TABLE `t_setting` (
 
 
 ### Programming
-
-
 1. Define Javabean for setting.
+    The bean's each field represent a setting for the system which can be mapping to 
+    the setting table row.
+    ```java
+    public class XyzSetting {
+        private int maxSubscribesPerMember;
+        private boolean allowQueuing;
 
-The bean's each field represent a setting for the system which can be mapping to 
-the setting table row.
+        @SettingField(name = "CANCEL_SUBSCRIPTION_MIN_BEFORE_HOURS",
+                format = SettingValueFormat.HumanTimeDuration, timeUnit = TimeUnit.MINUTES)
+        private int cancelSubscriptionMinBeforeMinutes = 0;  // 取消预约最少提前的小时数
 
-```java
-public class XyzSetting {
-    private int maxSubscribesPerMember;
-    private boolean allowQueuing;
-   
-    @SettingField(name = "CANCEL_SUBSCRIPTION_MIN_BEFORE_HOURS",
-            format = SettingValueFormat.HumanTimeDuration, timeUnit = TimeUnit.MINUTES)
-    private int cancelSubscriptionMinBeforeMinutes = 0;  // 取消预约最少提前的小时数
-  
-    @SettingField(ignored = true)
-    private String cancelSubscriptionMinBeforeReadable;  // 取消预约最少提前的小时数
+        @SettingField(ignored = true)
+        private String cancelSubscriptionMinBeforeReadable;  // 取消预约最少提前的小时数
 
-    @SettingField(format = SettingValueFormat.SimpleList)
-    private List<String> themes = ImmutableList.of("#333");  // 场馆可选主题色列表
-}
-```
-
-2. Define the setting service
-
-```java
-@Service
-public class XyzSettingService extends SettingService<XyzSetting> {
-
-    @Autowired
-    public XyzSettingService(XyzBeanDao dao, XyzBeanCache cache) {
-        // Here the customized table name is set to t_setting
-        super(XyzSetting.class, "t_setting", new SettingUpdater(dao, cache));
+        @SettingField(format = SettingValueFormat.SimpleList)
+        private List<String> themes = ImmutableList.of("#333");  // 场馆可选主题色列表
     }
-}
+    ```
 
-```
+1. Define the setting service
+    ```java
+    @Service
+    public class XyzSettingService extends SettingService<XyzSetting> {
 
-3. Define the data access object
-
-```java
-@Eqler
-public interface XyzBeanDao extends SettingBeanDao {
-}
-
-```
-
-4. Define the setting cache if required
-
-```java
-@Service
-public class XyzBeanCache implements SettingCacheable {
-    @Autowired XyzBeanDao xyzBeanDao;
-
-    @WestCacheable(manager = "redis")
-    @Override public <T> T getSettings(Class<T> beanClass, String settingTable) {
-        val items = xyzBeanDao.querySettingItems(settingTable);
-        T t = SettingUtil.populateBean(beanClass, items);
-        return SettingUtil.autowire(t);
-    }
-}
-
-```
-
-5. Use the setting bean where required
-
-```java
-@Service
-public class MyService {
-    @Autowired XyzSettingService xyzSettingService;
-
-
-    public void addQueueing() {
-        val settings = xyzSettingService.getSettingBean();
-        if (settings.isAllowQueuing()) {
-            // do queueing hrere
+        @Autowired
+        public XyzSettingService(XyzBeanDao dao, XyzBeanCache cache) {
+            // Here the customized table name is set to t_setting
+            super(XyzSetting.class, "t_setting", new SettingUpdater(dao, cache));
         }
-
     }
-}
+    ```
+1. Define the data access object
+    ```java
+    @Eqler
+    public interface XyzBeanDao extends SettingBeanDao {
+    }
+    ```
+1. Define the setting cache if required
+    ```java
+    @Service
+    public class XyzBeanCache implements SettingCacheable {
+        @Autowired XyzBeanDao xyzBeanDao;
 
-```
+        @WestCacheable(manager = "redis")
+        @Override public <T> T getSettings(Class<T> beanClass, String settingTable) {
+            val items = xyzBeanDao.querySettingItems(settingTable);
+            T t = SettingUtil.populateBean(beanClass, items);
+            return SettingUtil.autowire(t);
+        }
+    }
+    ```
+1. Use the setting bean where required
+    ```java
+    @Service
+    public class MyService {
+        @Autowired XyzSettingService xyzSettingService;
+
+
+        public void addQueueing() {
+            val settings = xyzSettingService.getSettingBean();
+            if (settings.isAllowQueuing()) {
+                // do queueing hrere
+            }
+
+        }
+    }
+    ```
