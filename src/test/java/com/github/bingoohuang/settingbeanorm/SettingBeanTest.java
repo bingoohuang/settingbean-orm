@@ -40,18 +40,29 @@ public class SettingBeanTest {
 
 
     @Test
+    public void cache() {
+        val settings = xyzSettingService.getSettingBean();
+        settings.setAllowQueuing(!settings.isAllowQueuing());
+
+        val settings2 = xyzSettingService.getSettingBean();
+        assertThat(settings).isNotSameAs(settings2);
+        assertThat(settings).isNotEqualTo(settings2);
+    }
+
+
+    @Test
     public void getSettings() {
-        val Settings = xyzSettingService.getSettingBean();
+        val setting = xyzSettingService.getSettingBean();
         val other = MySetting.builder().maxSubscribesPerMember(10).allowQueuing(true).xx(100)
                 .cancelSubscriptionMinBeforeMinutes(30).cancelSubscriptionMinBeforeReadable("30分钟")
                 .themes(Lists.newArrayList("red", "blue", "green"))
                 .businessTime(new BusinessTime("09:00", "19:00"))
                 .build();
-        assertThat(Settings).isEqualTo(other);
+        assertThat(setting).isEqualTo(other);
 
-        Settings.setMaxSubscribesPerMember(11);
-        Settings.setAllowQueuing(false);
-        xyzSettingService.updateSettings(Settings);
+        setting.setMaxSubscribesPerMember(11);
+        setting.setAllowQueuing(false);
+        xyzSettingService.updateSettings(setting);
 
         val Settings2 = xyzSettingService.getSettingBean();
         val other2 = MySetting.builder().maxSubscribesPerMember(11).allowQueuing(false).xx(100)

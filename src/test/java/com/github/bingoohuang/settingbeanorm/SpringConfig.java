@@ -2,7 +2,6 @@ package com.github.bingoohuang.settingbeanorm;
 
 
 import com.github.bingoohuang.westcache.spring.WestCacheableEnabled;
-import com.github.bingoohuang.westcache.utils.FastJsons;
 import lombok.val;
 import org.n3r.eql.eqler.spring.EqlerScan;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
@@ -17,7 +16,7 @@ import redis.embedded.RedisServer;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-@ComponentScan(basePackageClasses = {SpringConfig.class})
+@ComponentScan
 @Configuration
 @EqlerScan
 @WestCacheableEnabled
@@ -33,7 +32,6 @@ public class SpringConfig {
 
     @Bean @Primary
     public Jedis thisJedisCommands() {
-        FastJsons.json(null);
         return new Jedis("127.0.0.1", EmbeddedRedis.port);
     }
 
@@ -49,8 +47,8 @@ public class SpringConfig {
         redisServer.stop();
     }
 
-    @Bean
-    public SettingUpdater settingUpdater(@Autowired XyzBeanDao dao, @Autowired XyzBeanCache xyzBeanCache) {
+    @Bean @Autowired
+    public SettingUpdater settingUpdater(XyzBeanDao dao, XyzBeanCache xyzBeanCache) {
         return new SettingUpdater(dao, xyzBeanCache);
     }
 

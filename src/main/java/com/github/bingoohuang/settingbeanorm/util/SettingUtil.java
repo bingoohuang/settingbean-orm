@@ -11,6 +11,7 @@ import lombok.val;
 import org.apache.commons.lang3.StringUtils;
 import org.n3r.eql.base.AfterPropertiesSet;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -18,16 +19,9 @@ import java.util.stream.Collectors;
 
 import static com.github.bingoohuang.settingbeanorm.util.FieldValuePopulator.populate;
 
-
 @Slf4j
 public class SettingUtil {
-    public static String getSettingName(SettingField a, Field f) {
-        if (a == null) return f.getName();
-
-        return firstNoneEmpty(a.name(), a.value(), f.getName());
-    }
-
-    private static String firstNoneEmpty(String... values) {
+    public static String firstNoneEmpty(String... values) {
         for (val value : values) {
             if (StringUtils.isNotEmpty(value)) return value;
         }
@@ -35,28 +29,53 @@ public class SettingUtil {
         throw new RuntimeException("No non-empty values");
     }
 
-    public static String getSettingTitle(SettingField a, String defaultValue) {
-        return a == null ? defaultValue : firstNoneEmpty(a.title(), defaultValue);
-    }
+    public static SettingField getSettingField(Field f) {
+        SettingField field = f.getAnnotation(SettingField.class);
+        if (field != null) return field;
 
-    public static SettingValueFormat getFormat(SettingField a) {
-        return a == null ? SettingValueFormat.Default : a.format();
-    }
+        return new SettingField() {
+            @Override public Class<? extends Annotation> annotationType() {
+                return SettingField.class;
+            }
 
-    public static TimeUnit getTimeUnit(SettingField a) {
-        return a == null ? null : a.timeUnit();
+            @Override public String value() {
+                return f.getName();
+            }
+
+            @Override public String name() {
+                return f.getName();
+            }
+
+            @Override public String title() {
+                return f.getName();
+            }
+
+            @Override public SettingValueFormat format() {
+                return SettingValueFormat.Default;
+            }
+
+            @Override public TimeUnit timeUnit() {
+                return TimeUnit.SECONDS;
+            }
+
+            @Override public boolean ignored() {
+                return false;
+            }
+        };
     }
 
     public static <T> T populateBean(Class<T> beanClass, List<SettingItem> items) {
-        val itemsMap = items.stream().collect(Collectors.toMap(x -> x.getName(), x -> x));
+        val map = items.stream().collect(Collectors.toMap(x -> x.getName(), x -> x));
         T bean = Reflect.on(beanClass).create().get();
         for (val f : beanClass.getDeclaredFields()) {
-            val a = f.getAnnotation(SettingField.class);
-            if (a != null && a.ignored()) continue;
+            if (SettingUtil.isIgnored(f)) continue;
 
-            val item = itemsMap.get(getSettingName(a, f));
+            val sf = getSettingField(f);
+            if (sf.ignored()) continue;
+
+            val item = map.get(firstNoneEmpty(sf.name(), sf.value(), f.getName()));
             if (item != null) {
-                populate(f, bean, item.getValue(), getFormat(a), getTimeUnit(a));
+                populate(f, bean, item.getValue(), sf.format(), sf.timeUnit());
             }
         }
         return bean;
@@ -73,5 +92,13 @@ public class SettingUtil {
         }
 
         return t;
+    }
+
+
+    public static boolean isIgnored(Field f) {
+        if (f.isSynthetic()) return true;
+        // ignore un-normal fields like $jacocoData
+        if (f.getName().startsWith("$")) return true;
+        return false;
     }
 }
