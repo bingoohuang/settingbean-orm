@@ -1,11 +1,11 @@
 package com.github.bingoohuang.settingbeanorm;
 
 
+import com.github.bingoohuang.settingbeanorm.util.EmbeddedRedis;
 import com.github.bingoohuang.westcache.spring.WestCacheableEnabled;
 import lombok.val;
 import org.n3r.eql.eqler.spring.EqlerScan;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -46,10 +46,4 @@ public class SpringConfig {
     public void stopRedis() {
         redisServer.stop();
     }
-
-    @Bean @Autowired
-    public SettingUpdater settingUpdater(XyzBeanDao dao, XyzBeanCache xyzBeanCache) {
-        return new SettingUpdater(dao, xyzBeanCache);
-    }
-
 }

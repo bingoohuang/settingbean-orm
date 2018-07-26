@@ -1,6 +1,11 @@
-package com.github.bingoohuang.settingbeanorm;
+package com.github.bingoohuang.settingbeanorm.test;
 
 
+import com.github.bingoohuang.settingbeanorm.xyz.XyzSettingService;
+import com.github.bingoohuang.settingbeanorm.util.BusinessTime;
+import com.github.bingoohuang.settingbeanorm.xyz.XyzSetting;
+import com.github.bingoohuang.settingbeanorm.SettingItem;
+import com.github.bingoohuang.settingbeanorm.SpringConfig;
 import com.google.common.collect.Lists;
 import lombok.val;
 import org.joda.time.DateTime;
@@ -53,7 +58,7 @@ public class SettingBeanTest {
     @Test
     public void getSettings() {
         val setting = xyzSettingService.getSettingBean();
-        val other = MySetting.builder().maxSubscribesPerMember(10).allowQueuing(true).xx(100)
+        val other = XyzSetting.builder().maxSubscribesPerMember(10).allowQueuing(true).xx(100)
                 .cancelSubscriptionMinBeforeMinutes(30).cancelSubscriptionMinBeforeReadable("30分钟")
                 .themes(Lists.newArrayList("red", "blue", "green"))
                 .businessTime(new BusinessTime("09:00", "19:00"))
@@ -65,7 +70,7 @@ public class SettingBeanTest {
         xyzSettingService.updateSettings(setting);
 
         val Settings2 = xyzSettingService.getSettingBean();
-        val other2 = MySetting.builder().maxSubscribesPerMember(11).allowQueuing(false).xx(100)
+        val other2 = XyzSetting.builder().maxSubscribesPerMember(11).allowQueuing(false).xx(100)
                 .cancelSubscriptionMinBeforeMinutes(30).cancelSubscriptionMinBeforeReadable("30分钟")
                 .themes(Lists.newArrayList("red", "blue", "green"))
                 .businessTime(new BusinessTime("09:00", "19:00"))

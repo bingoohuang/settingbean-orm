@@ -1,5 +1,6 @@
-package com.github.bingoohuang.settingbeanorm;
+package com.github.bingoohuang.settingbeanorm.xyz;
 
+import com.github.bingoohuang.settingbeanorm.SettingCacheable;
 import com.github.bingoohuang.settingbeanorm.util.SettingUtil;
 import com.github.bingoohuang.westcache.WestCacheable;
 import lombok.val;

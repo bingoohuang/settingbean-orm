@@ -1,4 +1,4 @@
-package com.github.bingoohuang.settingbeanorm;
+package com.github.bingoohuang.settingbeanorm.util;
 
 import lombok.Cleanup;
 import lombok.SneakyThrows;

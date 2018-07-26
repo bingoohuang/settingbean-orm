@@ -3,41 +3,41 @@ package com.github.bingoohuang.settingbeanorm;
 import java.util.List;
 
 public interface SettingServiceable<T> {
-    SettingUpdater settingUpdater();
+    SettingUpdater getSettingUpdater();
 
-    Class<T> beanClass();
+    Class<T> getBeanClass();
 
-    String settingTable();
+    String getSettingTable();
 
     /**
      * 获取配置（用于业务逻辑判断）。
      */
     default T getSettingBean() {
-        return settingUpdater().getSettingBean(beanClass(), settingTable());
+        return getSettingUpdater().getSettingBean(getBeanClass(), getSettingTable());
     }
 
     /**
      * 获取配置项列表（用于配置页面）
      */
     default List<SettingItem> getSettingsItems() {
-        return settingUpdater().getSettingsItems(settingTable());
+        return getSettingUpdater().getSettingsItems(getSettingTable());
     }
 
     /**
      * 更新配置。（适合直接单项配置的更新）
      */
     default void updateSettings(T settingBean) {
-        settingUpdater().updateSettings(settingBean, settingTable());
+        getSettingUpdater().updateSettings(settingBean, getSettingTable());
     }
 
     /**
      * 更新配置。（适合从页面上多项配置同时更新）
      */
     default void updateSettings(List<SettingItem> changes) {
-        settingUpdater().updateSettings(beanClass(), changes, settingTable());
+        getSettingUpdater().updateSettings(getBeanClass(), changes, getSettingTable());
     }
 
     default void clearSettingsCache() {
-        settingUpdater().clearSettingsCache(beanClass(), settingTable());
+        getSettingUpdater().clearSettingsCache(getBeanClass(), getSettingTable());
     }
 }

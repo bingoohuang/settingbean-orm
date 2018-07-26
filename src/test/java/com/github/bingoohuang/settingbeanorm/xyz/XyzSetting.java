@@ -1,6 +1,9 @@
-package com.github.bingoohuang.settingbeanorm;
+package com.github.bingoohuang.settingbeanorm.xyz;
 
+import com.github.bingoohuang.settingbeanorm.SettingField;
+import com.github.bingoohuang.settingbeanorm.SettingValueFormat;
 import com.github.bingoohuang.settingbeanorm.spring.Autowireable;
+import com.github.bingoohuang.settingbeanorm.util.BusinessTime;
 import com.google.common.collect.ImmutableList;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,7 +15,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Data @AllArgsConstructor @NoArgsConstructor @Builder
-public class MySetting implements AfterPropertiesSet, Autowireable {
+public class XyzSetting implements AfterPropertiesSet, Autowireable {
     private int maxSubscribesPerMember;
     private boolean allowQueuing;
     @SettingField(name = "CANCEL_SUBSCRIPTION_MIN_BEFORE_HOURS",
