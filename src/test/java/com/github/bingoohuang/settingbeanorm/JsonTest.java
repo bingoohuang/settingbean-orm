@@ -51,7 +51,7 @@ public class JsonTest {
         val dt = DateTime.parse(time, DateTimeFormat.forPattern(pattern));
 
         String json = JSON.toJSONString(dt, config);
-        assertThat(json).isEqualTo("1532576337000");
+        assertThat(json).isEqualTo(dt.getMillis() + "");
     }
 
     @Data @AllArgsConstructor @NoArgsConstructor
@@ -77,7 +77,7 @@ public class JsonTest {
         String pattern = "yyyy-MM-dd HH:mm:ss";
         val dt1 = DateTime.parse(time, DateTimeFormat.forPattern(pattern));
 
-        DateTime dt2 = JSON.parseObject("1532576337000", DateTime.class, config);
+        DateTime dt2 = JSON.parseObject(dt1.getMillis() + "", DateTime.class, config);
         assertThat(dt2).isEqualTo(dt1);
 
         DateTime dt3 = JSON.parseObject('"' + time + '"', DateTime.class, config);

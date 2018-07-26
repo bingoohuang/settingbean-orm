@@ -12,7 +12,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -42,19 +41,23 @@ public class SettingUpdater {
         List<SettingItem> changes = Lists.newArrayList();
         List<SettingItem> news = Lists.newArrayList();
 
-        val settingsItems = settingBeanDao.querySettingItems(settingTable).stream().collect(Collectors.toMap(x -> x.getName(), x -> x));
+        val settingsItems = settingBeanDao.querySettingItems(settingTable).stream()
+                .collect(Collectors.toMap(x -> x.getName(), x -> x));
         for (val f : settingBean.getClass().getDeclaredFields()) {
-            if (!f.isAccessible()) f.setAccessible(true);
-
+            if (f.isSynthetic()) continue;
+            // ignore un-normal fields like $jacocoData
+            if (f.getName().startsWith("$")) continue;
             val a = f.getAnnotation(SettingField.class);
             if (a != null && a.ignored()) continue;
+
+            if (!f.isAccessible()) f.setAccessible(true);
 
             val settingName = SettingUtil.getSettingName(a, f);
             val settingTitle = SettingUtil.getSettingTitle(a, settingName);
             val format = SettingUtil.getFormat(a);
             val unit = SettingUtil.getTimeUnit(a);
             val settingValue = FieldValuePopulator.fieldToString(f, f.get(settingBean), format, unit);
-            detectChanged(settingsItems, settingName, settingValue, settingTitle, changes, news);
+            detectChanged(settingsItems.get(settingName), settingName, settingValue, settingTitle, changes, news);
         }
 
         saveUpdatedSettings(settingBean.getClass(), changes, news, settingTable);
@@ -67,17 +70,17 @@ public class SettingUpdater {
         List<SettingItem> changed = Lists.newArrayList();
         List<SettingItem> news = Lists.newArrayList();
 
-        val settingsItems = settingBeanDao.querySettingItems(settingTable).stream().collect(Collectors.toMap(x -> x.getName(), x -> x));
+        val settingsItems = settingBeanDao.querySettingItems(settingTable).stream()
+                .collect(Collectors.toMap(x -> x.getName(), x -> x));
         for (val c : changes) {
-            detectChanged(settingsItems, c.getName(), c.getValue(), c.getTitle(), changed, news);
+            detectChanged(settingsItems.get(c.getName()), c.getName(), c.getValue(), c.getTitle(), changed, news);
         }
 
         saveUpdatedSettings(settingBeanClass, changed, news, settingTable);
     }
 
 
-    private void detectChanged(Map<String, SettingItem> items, String name, String value, String title, List<SettingItem> changes, List<SettingItem> news) {
-        val item = items.get(name);
+    private void detectChanged(SettingItem item, String name, String value, String title, List<SettingItem> changes, List<SettingItem> news) {
         if (item == null) {
             news.add(SettingItem.builder()
                     .name(name).value(value).title(title).editable(true)
