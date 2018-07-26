@@ -1,5 +1,11 @@
 # settingbean-orm
 Map setting javabean fields  to database setting table rows.
+<br/>
+[![Build Status](https://travis-ci.org/bingoohuang/settingbean-orm.svg?branch=master)](https://travis-ci.org/bingoohuang/settingbean-orm)
+[![Quality Gate](https://sonarqube.com/api/badges/gate?key=com.github.bingoohuang%3Asettingbean-orm)](https://sonarqube.com/dashboard/index/com.github.bingoohuang%3Asettingbean-orm)
+[![Coverage Status](https://coveralls.io/repos/github/bingoohuang/settingbean-orm/badge.svg?branch=master)](https://coveralls.io/github/bingoohuang/settingbean-orm?branch=master)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.bingoohuang/settingbean-orm/badge.svg?style=flat-square)](https://maven-badges.herokuapp.com/maven-central/com.github.bingoohuang/settingbean-orm/)
+[![License](http://img.shields.io/:license-apache-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 
 ## Example
