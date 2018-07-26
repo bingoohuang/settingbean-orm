@@ -14,14 +14,13 @@ Map setting javabean fields  to database setting table rows.
 public class MySetting {
     private int maxSubscribesPerMember;
     private boolean allowQueuing;
+   
     @SettingField(name = "CANCEL_SUBSCRIPTION_MIN_BEFORE_HOURS",
             format = SettingValueFormat.HumanTimeDuration, timeUnit = TimeUnit.MINUTES)
     private int cancelSubscriptionMinBeforeMinutes = 0;  // 取消预约最少提前的小时数
+  
     @SettingField(ignored = true)
     private String cancelSubscriptionMinBeforeReadable;  // 取消预约最少提前的小时数
-
-    @SettingField(title = "测试配置XX")
-    private int xx = -1;
 
     @SettingField(format = SettingValueFormat.SimpleList)
     private List<String> themes = ImmutableList.of("#333");  // 场馆可选主题色列表
@@ -46,5 +45,4 @@ CREATE TABLE `t_setting` (
 
 ```
 
-
-![image](https://user-images.githubusercontent.com/1940588/43242284-b563a6b6-90d2-11e8-8633-d4ed44d18a0e.png)
+![image](https://user-images.githubusercontent.com/1940588/43242817-c4d9a4b2-90d5-11e8-86be-d5bfdea74c61.png)
