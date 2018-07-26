@@ -38,6 +38,7 @@ CREATE TABLE `t_setting` (
 
 ### Programming
 1. Define Javabean for setting.
+    
     The bean's each field represent a setting for the system which can be mapping to 
     the setting table row.
     ```java
