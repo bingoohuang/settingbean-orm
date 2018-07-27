@@ -47,7 +47,7 @@
             <groupId>com.github.bingoohuang</groupId>
             <artifactId>westcache</artifactId>
             <version>0.0.32</version>
-            <scope>test</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.github.bingoohuang</groupId>

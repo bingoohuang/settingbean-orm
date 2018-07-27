@@ -1,6 +1,6 @@
 package com.github.bingoohuang.settingbeanorm.util;
 
-import com.github.bingoohuang.settingbeanorm.SettingBeanDao;
+import com.github.bingoohuang.settingbeanorm.spring.SettingBeanDao;
 import com.github.bingoohuang.settingbeanorm.SettingItem;
 import com.github.bingoohuang.settingbeanorm.validator.ValueValidatorSpec;
 import com.google.common.collect.Lists;

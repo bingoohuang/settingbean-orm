@@ -1,13 +1,14 @@
 package com.github.bingoohuang.settingbeanorm;
 
+import com.github.bingoohuang.settingbeanorm.spring.SettingBeanDao;
 import com.github.bingoohuang.settingbeanorm.util.SettingUtil;
 import com.github.bingoohuang.settingbeanorm.util.UpdaterImpl;
 import lombok.val;
 
 import java.util.List;
 
-public abstract class SettingServiceable<T> {
-    protected abstract Class<T> getBeanClass();
+public abstract class SettingServiceable {
+    protected abstract Class<?> getBeanClass();
 
     protected abstract String getSettingTable();
 
@@ -18,10 +19,10 @@ public abstract class SettingServiceable<T> {
     /**
      * 获取配置（用于业务逻辑判断）。
      */
-    protected abstract T getSettingBean();
+    protected abstract <T> T getSettingBean();
 
 
-    protected T getUncachedSettingBean() {
+    protected Object getUncachedSettingBean() {
         val items = getSettingBeanDao().querySettingItems(getSettingTable());
         return SettingUtil.populateBean(getBeanClass(), items);
     }
@@ -36,7 +37,7 @@ public abstract class SettingServiceable<T> {
     /**
      * 更新配置。（适合直接单项配置的更新）
      */
-    public void updateSettings(T settingBean) {
+    public void updateSettings(Object settingBean) {
         String settingTable = getSettingTable();
         val updater = new UpdaterImpl(getSettingBeanDao(), settingTable);
         if (updater.update(settingBean)) {

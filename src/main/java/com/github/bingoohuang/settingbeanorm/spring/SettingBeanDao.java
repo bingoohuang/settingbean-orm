@@ -1,5 +1,6 @@
-package com.github.bingoohuang.settingbeanorm;
+package com.github.bingoohuang.settingbeanorm.spring;
 
+import com.github.bingoohuang.settingbeanorm.SettingItem;
 import org.n3r.eql.eqler.annotations.Dynamic;
 import org.n3r.eql.eqler.annotations.Eqler;
 import org.n3r.eql.eqler.annotations.Sql;

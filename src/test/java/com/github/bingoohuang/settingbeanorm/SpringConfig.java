@@ -1,6 +1,7 @@
 package com.github.bingoohuang.settingbeanorm;
 
 
+import com.github.bingoohuang.settingbeanorm.spring.SettingBeanOrmEnabled;
 import com.github.bingoohuang.settingbeanorm.util.EmbeddedRedis;
 import com.github.bingoohuang.westcache.spring.WestCacheableEnabled;
 import lombok.val;
@@ -20,6 +21,7 @@ import javax.annotation.PreDestroy;
 @Configuration
 @EqlerScan
 @WestCacheableEnabled
+@SettingBeanOrmEnabled
 public class SpringConfig {
     private RedisServer redisServer;
 
