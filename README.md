@@ -60,15 +60,44 @@ CREATE TABLE `t_setting` (
 
 1. Define the setting service
     ```java
-    @Service
-    public class XyzSettingService extends SettingService<XyzSetting> {
-
-        @Autowired
-        public XyzSettingService(XyzBeanDao dao, XyzBeanCache cache) {
-            // Here the customized table name is set to t_setting
-            super(XyzSetting.class, "t_setting", new SettingUpdater(dao, cache));
+    @Component
+    public class XyzSettingService extends SettingServiceable<XyzSetting> {
+        @Autowired XyzBeanDao xyzBeanDao;
+        @Autowired XyzSettingServiceClearCache xyzSettingServiceClearCache;
+    
+        @Override public Class<XyzSetting> getBeanClass() {
+            return XyzSetting.class;
+        }
+    
+        @Override public String getSettingTable() {
+            return "X_SETTING";
+        }
+    
+        @Override public SettingBeanDao getSettingBeanDao() {
+            return xyzBeanDao;
+        }
+    
+        @Override public void clearSettingsCache() {
+            // 不能从自身调用，否则方法代理不起作用，所以需要借道另外的类来完成
+            xyzSettingServiceClearCache.clearSettingsCache();
+        }
+    
+        @WestCacheable(manager = "redis")
+        @Override public XyzSetting getSettingBean() {
+            return getUncachedSettingBean();
+        }
+    
+        // 本类纯粹是为了完成清除缓存功能
+        @Component
+        static class XyzSettingServiceClearCache {
+            @Autowired XyzSettingService xyzSettingService;
+    
+            void clearSettingsCache() {
+                WestCacheConnector.clearCache(() -> xyzSettingService.getSettingBean());
+            }
         }
     }
+
     ```
 1. Define the data access object
     ```java
@@ -76,20 +105,7 @@ CREATE TABLE `t_setting` (
     public interface XyzBeanDao extends SettingBeanDao {
     }
     ```
-1. Define the setting cache if required
-    ```java
-    @Service
-    public class XyzBeanCache implements SettingCacheable {
-        @Autowired XyzBeanDao xyzBeanDao;
 
-        @WestCacheable(manager = "redis")
-        @Override public <T> T getSettings(Class<T> beanClass, String settingTable) {
-            val items = xyzBeanDao.querySettingItems(settingTable);
-            T t = SettingUtil.populateBean(beanClass, items);
-            return SettingUtil.autowire(t);
-        }
-    }
-    ```
 1. Use the setting bean where required
     ```java
     @Service

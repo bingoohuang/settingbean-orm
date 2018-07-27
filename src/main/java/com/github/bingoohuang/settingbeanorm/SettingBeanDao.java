@@ -1,11 +1,13 @@
 package com.github.bingoohuang.settingbeanorm;
 
 import org.n3r.eql.eqler.annotations.Dynamic;
+import org.n3r.eql.eqler.annotations.Eqler;
 import org.n3r.eql.eqler.annotations.Sql;
 import org.n3r.eql.eqler.annotations.SqlOptions;
 
 import java.util.List;
 
+@Eqler
 public interface SettingBeanDao {
     @Sql("SELECT NAME, VALUE, TITLE, EDITABLE, SPEC, CREATE_TIME, UPDATE_TIME FROM $$")
     List<SettingItem> querySettingItems(@Dynamic String settingTable);

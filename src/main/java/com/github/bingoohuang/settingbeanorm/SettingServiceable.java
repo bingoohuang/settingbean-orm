@@ -1,43 +1,58 @@
 package com.github.bingoohuang.settingbeanorm;
 
+import com.github.bingoohuang.settingbeanorm.util.SettingUtil;
+import com.github.bingoohuang.settingbeanorm.util.UpdaterImpl;
+import lombok.val;
+
 import java.util.List;
 
-public interface SettingServiceable<T> {
-    SettingUpdater<T> getSettingUpdater();
+public abstract class SettingServiceable<T> {
+    protected abstract Class<T> getBeanClass();
 
-    Class<T> getBeanClass();
+    protected abstract String getSettingTable();
 
-    String getSettingTable();
+    protected abstract SettingBeanDao getSettingBeanDao();
+
+    protected abstract void clearSettingsCache();
 
     /**
      * 获取配置（用于业务逻辑判断）。
      */
-    default T getSettingBean() {
-        return getSettingUpdater().getSettingBean(getBeanClass(), getSettingTable());
+    protected abstract T getSettingBean();
+
+
+    protected T getUncachedSettingBean() {
+        val items = getSettingBeanDao().querySettingItems(getSettingTable());
+        return SettingUtil.populateBean(getBeanClass(), items);
     }
 
     /**
      * 获取配置项列表（用于配置页面）
      */
-    default List<SettingItem> getSettingsItems() {
-        return getSettingUpdater().getSettingsItems(getSettingTable());
+    public List<SettingItem> getSettingsItems() {
+        return getSettingBeanDao().querySettingItems(getSettingTable());
     }
 
     /**
      * 更新配置。（适合直接单项配置的更新）
      */
-    default void updateSettings(T settingBean) {
-        getSettingUpdater().updateSettings(settingBean, getSettingTable());
+    public void updateSettings(T settingBean) {
+        String settingTable = getSettingTable();
+        val updater = new UpdaterImpl(getSettingBeanDao(), settingTable);
+        if (updater.update(settingBean)) {
+            clearSettingsCache();
+        }
+
     }
 
     /**
      * 更新配置。（适合从页面上多项配置同时更新）
      */
-    default void updateSettings(List<SettingItem> changes) {
-        getSettingUpdater().updateSettings(getBeanClass(), changes, getSettingTable());
-    }
-
-    default void clearSettingsCache() {
-        getSettingUpdater().clearSettingsCache(getBeanClass(), getSettingTable());
+    public void updateSettings(List<SettingItem> changes) {
+        String settingTable = getSettingTable();
+        val updater = new UpdaterImpl(getSettingBeanDao(), settingTable);
+        if (updater.update(changes)) {
+            clearSettingsCache();
+        }
     }
 }

@@ -69,13 +69,13 @@ public class SettingBeanTest {
         setting.setAllowQueuing(false);
         xyzSettingService.updateSettings(setting);
 
-        val Settings2 = xyzSettingService.getSettingBean();
+        val setting2 = xyzSettingService.getSettingBean();
         val other2 = XyzSetting.builder().maxSubscribesPerMember(11).allowQueuing(false).xx(100)
                 .cancelSubscriptionMinBeforeMinutes(30).cancelSubscriptionMinBeforeReadable("30分钟")
                 .themes(Lists.newArrayList("red", "blue", "green"))
                 .businessTime(new BusinessTime("09:00", "19:00"))
                 .build();
-        assertThat(Settings2).isEqualTo(other2);
+        assertThat(setting2).isEqualTo(other2);
 
         val SettingsItems = xyzSettingService.getSettingsItems();
         val item1 = SettingItem.builder()

@@ -3,8 +3,6 @@ package com.github.bingoohuang.settingbeanorm.util;
 import com.github.bingoohuang.settingbeanorm.SettingField;
 import com.github.bingoohuang.settingbeanorm.SettingItem;
 import com.github.bingoohuang.settingbeanorm.SettingValueFormat;
-import com.github.bingoohuang.settingbeanorm.spring.Autowireable;
-import com.github.bingoohuang.settingbeanorm.spring.Springs;
 import com.github.bingoohuang.utils.joor.Reflect;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -78,22 +76,14 @@ public class SettingUtil {
                 populate(f, bean, item.getValue(), sf.format(), sf.timeUnit());
             }
         }
+
+
+        if (bean instanceof AfterPropertiesSet) {
+            ((AfterPropertiesSet) bean).afterPropertiesSet();
+        }
+
         return bean;
     }
-
-
-    public static <T> T autowire(T t) {
-        if (t instanceof Autowireable) {
-            Springs.inject(t);
-        }
-
-        if (t instanceof AfterPropertiesSet) {
-            ((AfterPropertiesSet) t).afterPropertiesSet();
-        }
-
-        return t;
-    }
-
 
     public static boolean isIgnored(Field f) {
         if (f.isSynthetic()) return true;
