@@ -10,6 +10,6 @@ public class XyzSettingService extends SettingService<XyzSetting> {
 
     @Autowired
     public XyzSettingService(XyzBeanDao dao, XyzBeanCache cache) {
-        super(XyzSetting.class, "X_SETTING", new SettingUpdater(dao, cache));
+        super(XyzSetting.class, "X_SETTING", new SettingUpdater<>(dao, cache));
     }
 }

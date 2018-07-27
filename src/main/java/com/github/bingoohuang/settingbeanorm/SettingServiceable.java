@@ -3,7 +3,7 @@ package com.github.bingoohuang.settingbeanorm;
 import java.util.List;
 
 public interface SettingServiceable<T> {
-    SettingUpdater getSettingUpdater();
+    SettingUpdater<T> getSettingUpdater();
 
     Class<T> getBeanClass();
 

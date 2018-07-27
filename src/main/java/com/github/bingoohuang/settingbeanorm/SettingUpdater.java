@@ -9,14 +9,14 @@ import lombok.val;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class SettingUpdater {
+public class SettingUpdater<T> {
     private final SettingBeanDao settingBeanDao;
-    private final SettingCacheable settingCacheable;
+    private final SettingCacheable<T> settingCacheable;
 
     /**
      * 获取租户配置（用于业务逻辑判断）。
      */
-    public <T> T getSettingBean(Class<T> beanClass, String settingTable) {
+    public T getSettingBean(Class<T> beanClass, String settingTable) {
         return settingCacheable.getSettings(beanClass, settingTable);
     }
 
@@ -31,7 +31,7 @@ public class SettingUpdater {
      * 更新租户配置。（适合直接单项配置的更新）
      */
     @SneakyThrows
-    public void updateSettings(Object settingBean, String settingTable) {
+    public void updateSettings(T settingBean, String settingTable) {
         val updater = new UpdaterImpl(settingBeanDao, settingTable);
         if (updater.update(settingBean)) {
             clearSettingsCache(settingBean.getClass(), settingTable);
@@ -42,7 +42,7 @@ public class SettingUpdater {
     /**
      * 更新租户配置。（适合从页面上多项配置同时更新）
      */
-    public void updateSettings(Class<?> settingBeanClass, List<SettingItem> changes, String settingTable) {
+    public void updateSettings(Class<T> settingBeanClass, List<SettingItem> changes, String settingTable) {
         val updater = new UpdaterImpl(settingBeanDao, settingTable);
         if (updater.update(changes)) {
             clearSettingsCache(settingBeanClass, settingTable);
