@@ -31,6 +31,9 @@ public class XyzSetting implements AfterPropertiesSet {
 
     private BusinessTime businessTime = new BusinessTime("09:00", "19:00");
 
+
+    private String personalQrCode;
+
     @Override public void afterPropertiesSet() {
         if (xx == -1) xx = 100;
 

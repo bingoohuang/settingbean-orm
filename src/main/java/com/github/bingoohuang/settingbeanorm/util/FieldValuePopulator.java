@@ -27,8 +27,10 @@ public class FieldValuePopulator {
 
     private static HashMap<Class<?>, Function<String, ?>> parser = new HashMap<Class<?>, Function<String, ?>>() {{
         put(boolean.class, Boolean::parseBoolean); // Support boolean literals too
+        put(short.class, Short::parseShort);
         put(int.class, Integer::parseInt);
         put(long.class, Long::parseLong);
+        put(float.class, Float::valueOf);
         put(double.class, Double::valueOf);
         put(String.class, String::valueOf);  // Handle String without special test
     }};
@@ -51,6 +53,7 @@ public class FieldValuePopulator {
         Class<?> type = field.getType();
         if (type == Long.class || type == long.class) return Long.valueOf(l);
         if (type == Integer.class || type == int.class) return Integer.valueOf((int) l);
+        if (type == Short.class || type == short.class) return Short.valueOf((short) l);
 
         throw new RuntimeException("unsupported field number type for " + field);
     }
@@ -157,6 +160,8 @@ public class FieldValuePopulator {
     }
 
     private static String fieldToString(Field field, Object fieldValue) {
+        if (fieldValue == null) return "";
+
         val func = parser.get(field.getType());
         if (func != null) return fieldValue.toString();
 

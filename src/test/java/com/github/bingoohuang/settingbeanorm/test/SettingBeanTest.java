@@ -62,6 +62,7 @@ public class SettingBeanTest {
                 .cancelSubscriptionMinBeforeMinutes(30).cancelSubscriptionMinBeforeReadable("30分钟")
                 .themes(Lists.newArrayList("red", "blue", "green"))
                 .businessTime(new BusinessTime("09:00", "19:00"))
+                .personalQrCode(null)
                 .build();
         assertThat(setting).isEqualTo(other);
 
@@ -74,6 +75,7 @@ public class SettingBeanTest {
                 .cancelSubscriptionMinBeforeMinutes(30).cancelSubscriptionMinBeforeReadable("30分钟")
                 .themes(Lists.newArrayList("red", "blue", "green"))
                 .businessTime(new BusinessTime("09:00", "19:00"))
+                .personalQrCode("")
                 .build();
         assertThat(setting2).isEqualTo(other2);
 
