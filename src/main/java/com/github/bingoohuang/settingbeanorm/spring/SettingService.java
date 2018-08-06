@@ -7,19 +7,22 @@ import com.github.bingoohuang.westcache.WestCacheable;
 import com.github.bingoohuang.westcache.utils.WestCacheConnector;
 import lombok.SneakyThrows;
 import lombok.val;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.Properties;
 
 @Component
-public class SettingService extends SettingServiceable {
+public class SettingService extends SettingServiceable implements ApplicationContextAware {
     @Autowired SettingBeanDao settingBeanDao;
-    @Autowired SettingServiceClearCache settingServiceClearCache;
 
     private Class<?> beanClass;
     private String settingTable;
+    private ApplicationContext applicationContext;
 
     @PostConstruct @SneakyThrows
     public void postContruct() {
@@ -50,7 +53,7 @@ public class SettingService extends SettingServiceable {
 
     @Override public void clearSettingsCache() {
         // 不能从自身调用，否则方法代理不起作用，所以需要借道另外的类来完成
-        settingServiceClearCache.clearSettingsCache();
+        applicationContext.getBean(SettingServiceClearCache.class).clearSettingsCache();
     }
 
     @WestCacheable(manager = "redis")
@@ -58,9 +61,13 @@ public class SettingService extends SettingServiceable {
         return (T) getUncachedSettingBean();
     }
 
+    @Override public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
+
     // 本类纯粹是为了完成清除缓存功能
     @Component
-    static class SettingServiceClearCache {
+    public static class SettingServiceClearCache {
         @Autowired SettingService settingService;
 
         void clearSettingsCache() {
