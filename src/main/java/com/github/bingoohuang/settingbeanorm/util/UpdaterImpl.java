@@ -1,7 +1,7 @@
 package com.github.bingoohuang.settingbeanorm.util;
 
-import com.github.bingoohuang.settingbeanorm.spring.SettingBeanDao;
 import com.github.bingoohuang.settingbeanorm.SettingItem;
+import com.github.bingoohuang.settingbeanorm.spring.SettingBeanDao;
 import com.github.bingoohuang.settingbeanorm.validator.ValueValidatorSpec;
 import com.google.common.collect.Lists;
 import lombok.SneakyThrows;
@@ -43,11 +43,10 @@ public class UpdaterImpl {
     public boolean update(Object settingBean) {
         for (val f : settingBean.getClass().getDeclaredFields()) {
             if (SettingUtil.isIgnored(f)) continue;
-            val sf = SettingUtil.getSettingField(f);
-            if (sf.ignored()) continue;
 
             if (!f.isAccessible()) f.setAccessible(true);
 
+            val sf = SettingUtil.getSettingField(f);
             val settingName = firstNoneEmpty(sf.name(), sf.value(), f.getName());
             val settingTitle = firstNoneEmpty(sf.title(), settingName);
             val settingValue = FieldValuePopulator.fieldToString(f, f.get(settingBean), sf.format(), sf.timeUnit());

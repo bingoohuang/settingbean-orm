@@ -11,6 +11,7 @@ import org.n3r.eql.base.AfterPropertiesSet;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -69,14 +70,11 @@ public class SettingUtil {
             if (SettingUtil.isIgnored(f)) continue;
 
             val sf = getSettingField(f);
-            if (sf.ignored()) continue;
-
             val item = map.get(firstNoneEmpty(sf.name(), sf.value(), f.getName()));
             if (item != null) {
                 populate(f, bean, item.getValue(), sf.format(), sf.timeUnit());
             }
         }
-
 
         if (bean instanceof AfterPropertiesSet) {
             ((AfterPropertiesSet) bean).afterPropertiesSet();
@@ -87,8 +85,13 @@ public class SettingUtil {
 
     public static boolean isIgnored(Field f) {
         if (f.isSynthetic()) return true;
+        if (Modifier.isStatic(f.getModifiers())) return true;
         // ignore un-normal fields like $jacocoData
         if (f.getName().startsWith("$")) return true;
+
+        val sf = f.getAnnotation(SettingField.class);
+        if (sf != null && sf.ignored()) return true;
+
         return false;
     }
 }
