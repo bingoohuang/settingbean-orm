@@ -25,7 +25,7 @@ public class SettingService extends SettingServiceable implements ApplicationCon
     private ApplicationContext applicationContext;
 
     @PostConstruct @SneakyThrows
-    public void postContruct() {
+    public void postConstruct() {
         val is = ClzPath.toInputStream("settingbean-orm.properties");
         val p = new Properties();
         p.load(is);
