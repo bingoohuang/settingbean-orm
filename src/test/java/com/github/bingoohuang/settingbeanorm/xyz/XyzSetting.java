@@ -31,6 +31,7 @@ public class XyzSetting implements AfterPropertiesSet {
 
     private BusinessTime businessTime = new BusinessTime("09:00", "19:00");
 
+    private List<String> cardTypeNamesInShowOrder;
 
     private String personalQrCode;
 

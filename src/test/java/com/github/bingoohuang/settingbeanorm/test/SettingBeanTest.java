@@ -38,7 +38,8 @@ public class SettingBeanTest {
                 "insert into T_SETTING values('maxSubscribesPerMember', '10', '单会员最大订课数量', 1, '@Digits @Min(1) @Max(20) @Regex(\\d+)', '2018-04-25 13:15:45', '2018-04-25 13:15:45')"
                 , "insert into T_SETTING values('allowQueuing', 'true', '是否开启排队', 1, '@Boolean @Enum(true,false)', '2018-04-25 13:15:45', '2018-04-25 13:15:45')"
                 , "insert into T_SETTING values('CANCEL_SUBSCRIPTION_MIN_BEFORE_HOURS', '0.5h', '至少提前多少时间取消预订', 1, '', '2018-04-25 13:15:45', '2018-04-25 13:15:45')"
-                , "insert into T_SETTING values('themes', 'red,blue,green', '主题颜色', 1, '', '2018-04-25 13:15:45', '2018-04-25 13:15:45')");
+                , "insert into T_SETTING values('themes', 'red,blue,green', '主题颜色', 1, '', '2018-04-25 13:15:45', '2018-04-25 13:15:45')"
+                , "insert into T_SETTING values('cardTypeNamesInShowOrder', '', '测试', 1, '', '2018-04-25 13:15:45', '2018-04-25 13:15:45')");
     }
 
     @Autowired SettingService settingService;

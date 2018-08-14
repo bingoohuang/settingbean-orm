@@ -5,10 +5,10 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import lombok.SneakyThrows;
 import lombok.val;
+import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -20,9 +20,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 public class FieldValuePopulator {
     @SneakyThrows
     public static void populate(Field field, Object bean, String value, SettingValueFormat format, TimeUnit timeUnit) {
-        Object fieldValue = parseFieldValue(field, value, format, timeUnit);
         if (!field.isAccessible()) field.setAccessible(true);
-        field.set(bean, fieldValue);
+        field.set(bean, parseFieldValue(field, value, format, timeUnit));
     }
 
     private static HashMap<Class<?>, Function<String, ?>> parser = new HashMap<Class<?>, Function<String, ?>>() {{
@@ -40,8 +39,8 @@ public class FieldValuePopulator {
             case SimpleList:
                 return parseSimpleList(field, value);
             case HumanTimeDuration:
-                TimeDuration duration = parseTimeDuration(field.getName(), value);
-                long l = convertUnit(timeUnit, duration);
+                val duration = parseTimeDuration(field.getName(), value);
+                val l = convertUnit(timeUnit, duration);
                 return convertNumberType(l, field);
             case Default:
             default:
@@ -50,7 +49,7 @@ public class FieldValuePopulator {
     }
 
     private static Object convertNumberType(long l, Field field) {
-        Class<?> type = field.getType();
+        val type = field.getType();
         if (type == Long.class || type == long.class) return Long.valueOf(l);
         if (type == Integer.class || type == int.class) return Integer.valueOf((int) l);
         if (type == Short.class || type == short.class) return Short.valueOf((short) l);
@@ -59,7 +58,7 @@ public class FieldValuePopulator {
     }
 
     private static long convertUnit(TimeUnit timeUnit, TimeDuration duration) {
-        double fractional = duration.getValue() % 1;
+        val fractional = duration.getValue() % 1;
         if (fractional < 0.001) return timeUnit.convert((long) duration.getValue(), duration.getUnit());
 
         if (fractional - 0.5 < 0.001) {
@@ -80,13 +79,13 @@ public class FieldValuePopulator {
         checkArgument(spec != null && !spec.isEmpty(), "value of key %s omitted", key);
 
         try {
-            char lastChar = spec.charAt(spec.length() - 1);
+            val lastChar = spec.charAt(spec.length() - 1);
             if (lastChar >= '0' && lastChar <= '9') {
                 return TimeDuration.builder().value(Double.parseDouble(spec)).unit(TimeUnit.HOURS).build();
             }
 
-            String value = spec.substring(0, spec.length() - 1);
-            double duration = Double.parseDouble(value);
+            val value = spec.substring(0, spec.length() - 1);
+            val duration = Double.parseDouble(value);
             switch (lastChar) {
                 case 'd':
                     return TimeDuration.builder().value(duration).unit(TimeUnit.DAYS).build();
@@ -109,7 +108,7 @@ public class FieldValuePopulator {
         checkTypeList(field);
         val values = Splitter.on(',').omitEmptyStrings().trimResults().splitToList(value);
 
-        Class<?> argClas = parseListArgType(field);
+        val argClas = parseListArgType(field);
         if (argClas == String.class) return values;
 
         val fun = parser.get(argClas);
@@ -120,8 +119,8 @@ public class FieldValuePopulator {
         return (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
     }
 
-    private static void checkTypeList(Field field) {
-        Type genericType = field.getGenericType();
+    public static void checkTypeList(Field field) {
+        val genericType = field.getGenericType();
         if (!(genericType instanceof ParameterizedType)) {
             throw new RuntimeException(field + "'type is not ParameterizedType");
         }
@@ -132,11 +131,17 @@ public class FieldValuePopulator {
         }
     }
 
-    private static Object parseDefault(Field field, String value) {
+    public static Object parseDefault(Field field, String value) {
         val fun = parser.get(field.getType());
         if (fun != null) return fun.apply(value);
 
-        return Jsons.parseJson(value, field);
+        if (StringUtils.isEmpty(value)) return null;
+
+        try {
+            return Jsons.parseJson(value, field);
+        } catch (Exception e) {
+            throw new RuntimeException("fail to parse json for field " + field + " with value {" + value + "}", e);
+        }
     }
 
     public static String fieldToString(Field field, Object fieldValue, SettingValueFormat format, TimeUnit unit) {
