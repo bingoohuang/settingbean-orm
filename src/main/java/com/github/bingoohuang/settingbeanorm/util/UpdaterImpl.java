@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.github.bingoohuang.settingbeanorm.util.FieldValueSetter.fieldToString;
 import static com.github.bingoohuang.settingbeanorm.util.SettingUtil.firstNoneEmpty;
 
 public class UpdaterImpl {
@@ -49,7 +50,7 @@ public class UpdaterImpl {
             val sf = SettingUtil.getSettingField(f);
             val settingName = firstNoneEmpty(sf.name(), sf.value(), f.getName());
             val settingTitle = firstNoneEmpty(sf.title(), settingName);
-            val settingValue = FieldValuePopulator.fieldToString(f, f.get(settingBean), sf.format(), sf.timeUnit());
+            val settingValue = fieldToString(f, f.get(settingBean), sf.format(), sf.timeUnit());
             detectChanged(settingsItems.get(settingName), settingName, settingValue, settingTitle);
         }
 

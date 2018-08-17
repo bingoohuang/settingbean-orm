@@ -17,24 +17,32 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-public class FieldValuePopulator {
+public class FieldValueSetter {
     @SneakyThrows
-    public static void populate(Field field, Object bean, String value, SettingValueFormat format, TimeUnit timeUnit) {
+    public static void populate(Field field, Object bean, String value,
+                                SettingValueFormat format, TimeUnit timeUnit) {
         if (!field.isAccessible()) field.setAccessible(true);
         field.set(bean, parseFieldValue(field, value, format, timeUnit));
     }
 
-    private static HashMap<Class<?>, Function<String, ?>> parser = new HashMap<Class<?>, Function<String, ?>>() {{
+    private static HashMap<Class<?>, Function<String, ?>> parser
+            = new HashMap<Class<?>, Function<String, ?>>() {{
         put(boolean.class, Boolean::parseBoolean); // Support boolean literals too
         put(short.class, Short::parseShort);
         put(int.class, Integer::parseInt);
         put(long.class, Long::parseLong);
         put(float.class, Float::valueOf);
         put(double.class, Double::valueOf);
-        put(String.class, String::valueOf);  // Handle String without special test
+        put(String.class, FieldValueSetter::valueOfString);  // Handle String without special test
     }};
 
-    private static Object parseFieldValue(Field field, String value, SettingValueFormat format, TimeUnit timeUnit) {
+    public static String valueOfString(String s) {
+        return s;
+    }
+
+    private static Object parseFieldValue(
+            Field field, String value,
+            SettingValueFormat format, TimeUnit timeUnit) {
         switch (format) {
             case SimpleList:
                 return parseSimpleList(field, value);
@@ -57,50 +65,55 @@ public class FieldValuePopulator {
         throw new RuntimeException("unsupported field number type for " + field);
     }
 
-    private static long convertUnit(TimeUnit timeUnit, TimeDuration duration) {
-        val fractional = duration.getValue() % 1;
-        if (fractional < 0.001) return timeUnit.convert((long) duration.getValue(), duration.getUnit());
+    private static long convertUnit(TimeUnit unit, TimeDuration dur) {
+        val fractional = dur.getValue() % 1;
+        if (fractional < 0.001) return unit.convert((long) dur.getValue(), dur.getUnit());
 
         if (fractional - 0.5 < 0.001) {
-            if (duration.getUnit() == TimeUnit.DAYS) {
-                return timeUnit.convert((long) (duration.getValue() * 24), TimeUnit.HOURS);
-            } else if (duration.getUnit() == TimeUnit.HOURS) {
-                return timeUnit.convert((long) (duration.getValue() * 60), TimeUnit.MINUTES);
-            } else if (duration.getUnit() == TimeUnit.MINUTES) {
-                return timeUnit.convert((long) (duration.getValue() * 60), TimeUnit.SECONDS);
+            if (dur.getUnit() == TimeUnit.DAYS) {
+                return unit.convert((long) (dur.getValue() * 24), TimeUnit.HOURS);
+            } else if (dur.getUnit() == TimeUnit.HOURS) {
+                return unit.convert((long) (dur.getValue() * 60), TimeUnit.MINUTES);
+            } else if (dur.getUnit() == TimeUnit.MINUTES) {
+                return unit.convert((long) (dur.getValue() * 60), TimeUnit.SECONDS);
             }
         }
 
-        throw new RuntimeException("bad format " + duration);
+        throw new RuntimeException("bad format " + dur);
     }
 
 
     public static TimeDuration parseTimeDuration(String key, String spec) {
-        checkArgument(spec != null && !spec.isEmpty(), "value of key %s omitted", key);
+        checkArgument(spec != null && !spec.isEmpty(),
+                "value of key %s omitted", key);
 
         try {
             val lastChar = spec.charAt(spec.length() - 1);
             if (lastChar >= '0' && lastChar <= '9') {
-                return TimeDuration.builder().value(Double.parseDouble(spec)).unit(TimeUnit.HOURS).build();
+                return TimeDuration.builder().value(Double.parseDouble(spec))
+                        .unit(TimeUnit.HOURS).build();
             }
 
             val value = spec.substring(0, spec.length() - 1);
             val duration = Double.parseDouble(value);
+            val builder = TimeDuration.builder().value(duration);
             switch (lastChar) {
                 case 'd':
-                    return TimeDuration.builder().value(duration).unit(TimeUnit.DAYS).build();
+                    return builder.unit(TimeUnit.DAYS).build();
                 case 'h':
-                    return TimeDuration.builder().value(duration).unit(TimeUnit.HOURS).build();
+                    return builder.unit(TimeUnit.HOURS).build();
                 case 'm':
-                    return TimeDuration.builder().value(duration).unit(TimeUnit.MINUTES).build();
+                    return builder.unit(TimeUnit.MINUTES).build();
                 case 's':
-                    return TimeDuration.builder().value(duration).unit(TimeUnit.SECONDS).build();
+                    return builder.unit(TimeUnit.SECONDS).build();
                 default:
-                    throw new IllegalArgumentException(String.format("key %s invalid format.  was %s, " +
-                            "must end with one of [dDhHmMsS]", key, spec));
+                    throw new IllegalArgumentException(
+                            String.format("key %s invalid format.  was %s, " +
+                                    "must end with one of [dDhHmMsS]", key, spec));
             }
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(String.format("key %s value set to %s, must be integer", key, spec));
+            throw new IllegalArgumentException(String.format(
+                    "key %s value set to %s, must be integer", key, spec));
         }
     }
 
@@ -116,7 +129,8 @@ public class FieldValuePopulator {
     }
 
     private static Class<?> parseListArgType(Field field) {
-        return (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+        val genericType = (ParameterizedType) field.getGenericType();
+        return (Class<?>) genericType.getActualTypeArguments()[0];
     }
 
     public static void checkTypeList(Field field) {
@@ -140,11 +154,16 @@ public class FieldValuePopulator {
         try {
             return Jsons.parseJson(value, field);
         } catch (Exception e) {
-            throw new RuntimeException("fail to parse json for field " + field + " with value {" + value + "}", e);
+            throw new RuntimeException("fail to parse json for field "
+                    + field + " with value {" + value + "}", e);
         }
     }
 
-    public static String fieldToString(Field field, Object fieldValue, SettingValueFormat format, TimeUnit unit) {
+    public static String fieldToString(
+            Field field, Object fieldValue,
+            SettingValueFormat format, TimeUnit unit) {
+        if (fieldValue == null) return null;
+
         switch (format) {
             case SimpleList:
                 return Joiner.on(',').join((List<?>) fieldValue);
@@ -165,12 +184,9 @@ public class FieldValuePopulator {
     }
 
     private static String fieldToString(Field field, Object fieldValue) {
-        if (fieldValue == null) return "";
-
         val func = parser.get(field.getType());
         if (func != null) return fieldValue.toString();
 
         return Jsons.json(fieldValue);
     }
-
 }

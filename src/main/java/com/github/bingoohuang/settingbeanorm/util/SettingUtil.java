@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static com.github.bingoohuang.settingbeanorm.util.FieldValuePopulator.populate;
+import static com.github.bingoohuang.settingbeanorm.util.FieldValueSetter.populate;
 
 @Slf4j
 public class SettingUtil {

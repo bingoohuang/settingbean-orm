@@ -19,7 +19,7 @@ The table name can be customized, but the fields are required fixed as the follo
 DROP TABLE IF EXISTS `t_setting`;
 CREATE TABLE `t_setting` (
   `NAME` varchar(100) NOT NULL COMMENT '设置名',
-  `VALUE` varchar(100) NOT NULL COMMENT '设置值',
+  `VALUE` varchar(100) NULL COMMENT '设置值',
   `TITLE` varchar(100) NOT NULL COMMENT '设置标题，用于页面展示',
   `EDITABLE` tinyint(4) NOT NULL DEFAULT '1' COMMENT '是否可以通过页面编辑',
   `SPEC` varchar(100) DEFAULT NULL COMMENT '取值校验规则，目前支持@Digits @Min(1) @Max(100) @Regex等',

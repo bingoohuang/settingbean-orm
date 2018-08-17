@@ -27,7 +27,7 @@ public class SettingBeanTest {
     public static void beforeClass() {
         new Eql().execute("create table T_SETTING (" +
                 "NAME varchar(100) not null, " +
-                "VALUE varchar(100) not null, " +
+                "VALUE varchar(100) null, " +
                 "TITLE varchar(100) not null, " +
                 "EDITABLE int not null default 1, " +
                 "SPEC varchar(100) null, " +
@@ -63,7 +63,6 @@ public class SettingBeanTest {
                 .cancelSubscriptionMinBeforeMinutes(30).cancelSubscriptionMinBeforeReadable("30分钟")
                 .themes(Lists.newArrayList("red", "blue", "green"))
                 .businessTime(new BusinessTime("09:00", "19:00"))
-                .personalQrCode(null)
                 .build();
         assertThat(setting).isEqualTo(other);
 
@@ -71,14 +70,10 @@ public class SettingBeanTest {
         setting.setAllowQueuing(false);
         settingService.updateSettings(setting);
 
-        val setting2 = settingService.getSettingBean();
-        val other2 = XyzSetting.builder().maxSubscribesPerMember(11).allowQueuing(false).xx(100)
-                .cancelSubscriptionMinBeforeMinutes(30).cancelSubscriptionMinBeforeReadable("30分钟")
-                .themes(Lists.newArrayList("red", "blue", "green"))
-                .businessTime(new BusinessTime("09:00", "19:00"))
-                .personalQrCode("")
-                .build();
-        assertThat(setting2).isEqualTo(other2);
+        XyzSetting setting2 = settingService.getSettingBean();
+        other.setMaxSubscribesPerMember(11);
+        other.setAllowQueuing(false);
+        assertThat(setting2).isEqualTo(other);
 
         val SettingsItems = settingService.getSettingsItems();
         val item1 = SettingItem.builder()
