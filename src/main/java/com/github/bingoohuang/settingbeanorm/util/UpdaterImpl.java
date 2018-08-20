@@ -11,6 +11,7 @@ import org.joda.time.DateTime;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.github.bingoohuang.settingbeanorm.util.FieldValueSetter.fieldToString;
@@ -67,7 +68,7 @@ public class UpdaterImpl {
             return;
         }
 
-        if (item.getValue().equals(value)) return;
+        if (Objects.equals(item.getValue(), value)) return;
         if (!item.isEditable()) throw new RuntimeException("setting " + item + " is not editable");
 
         if (StringUtils.isNotEmpty(item.getSpec()))
