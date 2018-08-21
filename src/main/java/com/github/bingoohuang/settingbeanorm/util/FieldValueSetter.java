@@ -27,7 +27,7 @@ public class FieldValueSetter {
 
     private static HashMap<Class<?>, Function<String, ?>> parser
             = new HashMap<Class<?>, Function<String, ?>>() {{
-        put(boolean.class, Boolean::parseBoolean); // Support boolean literals too
+        put(boolean.class, FieldValueSetter::parseBoolean); // Support boolean literals too
         put(short.class, Short::parseShort);
         put(int.class, Integer::parseInt);
         put(long.class, Long::parseLong);
@@ -35,6 +35,15 @@ public class FieldValueSetter {
         put(double.class, Double::valueOf);
         put(String.class, FieldValueSetter::valueOfString);  // Handle String without special test
     }};
+
+    public static boolean parseBoolean(String s) {
+        return s != null && (s.equalsIgnoreCase("true")
+                || s.equals("1")
+                || s.equalsIgnoreCase("y")
+                || s.equalsIgnoreCase("t")
+                || s.equalsIgnoreCase("yes")
+                || s.equalsIgnoreCase("on"));
+    }
 
     public static String valueOfString(String s) {
         return s;
