@@ -3,6 +3,7 @@ package com.github.bingoohuang.settingbeanorm;
 import com.github.bingoohuang.settingbeanorm.spring.SettingBeanDao;
 import com.github.bingoohuang.settingbeanorm.util.SettingUtil;
 import com.github.bingoohuang.settingbeanorm.util.UpdaterImpl;
+import com.google.common.eventbus.EventBus;
 import lombok.val;
 
 import java.util.List;
@@ -27,6 +28,17 @@ public abstract class SettingServiceable {
         return SettingUtil.populateBean(getBeanClass(), items);
     }
 
+    // For setting changes notify
+    private EventBus eventBus = new EventBus();
+
+    public void registerSettingUpdate(Object receiver) {
+        eventBus.register(receiver);
+    }
+
+    public void unregisterSettingChange(Object receiver) {
+        eventBus.unregister(receiver);
+    }
+
     /**
      * 获取配置项列表（用于配置页面）
      */
@@ -40,10 +52,13 @@ public abstract class SettingServiceable {
     public void updateSettings(Object settingBean) {
         String settingTable = getSettingTable();
         val updater = new UpdaterImpl(getSettingBeanDao(), settingTable);
+        val old = getSettingBean();
+
         if (updater.update(settingBean)) {
             clearSettingsCache();
+            val nes = getSettingBean();
+            eventBus.post(new SettingUpdateEvent(old, nes));
         }
-
     }
 
     /**

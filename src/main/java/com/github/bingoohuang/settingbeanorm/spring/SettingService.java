@@ -18,11 +18,11 @@ import java.util.Properties;
 
 @Component
 public class SettingService extends SettingServiceable implements ApplicationContextAware {
-    @Autowired SettingBeanDao settingBeanDao;
+    @Autowired private SettingBeanDao settingBeanDao;
 
     private Class<?> beanClass;
     private String settingTable;
-    private ApplicationContext applicationContext;
+    private ApplicationContext appContext;
 
     @PostConstruct @SneakyThrows
     public void postConstruct() {
@@ -33,7 +33,7 @@ public class SettingService extends SettingServiceable implements ApplicationCon
         val beanClassName = p.getProperty("BeanClass");
         this.beanClass = Clz.findClass(beanClassName);
         if (this.beanClass == null) {
-            throw new RuntimeException("BeanClass for settting is not well configurated!");
+            throw new RuntimeException("BeanClass for setting is not well configured!");
         }
 
         this.settingTable = p.getProperty("SettingTable", "T_SETTING");
@@ -53,7 +53,7 @@ public class SettingService extends SettingServiceable implements ApplicationCon
 
     @Override public void clearSettingsCache() {
         // 不能从自身调用，否则方法代理不起作用，所以需要借道另外的类来完成
-        applicationContext.getBean(SettingServiceClearCache.class).clearSettingsCache();
+        appContext.getBean(SettingServiceClearCache.class).clearSettingsCache();
     }
 
     @WestCacheable(manager = "redis")
@@ -61,8 +61,8 @@ public class SettingService extends SettingServiceable implements ApplicationCon
         return (T) getUncachedSettingBean();
     }
 
-    @Override public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
+    @Override public void setApplicationContext(ApplicationContext appContext) throws BeansException {
+        this.appContext = appContext;
     }
 
     // 本类纯粹是为了完成清除缓存功能

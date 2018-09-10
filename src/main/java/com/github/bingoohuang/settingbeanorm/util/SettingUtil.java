@@ -90,8 +90,6 @@ public class SettingUtil {
         if (f.getName().startsWith("$")) return true;
 
         val sf = f.getAnnotation(SettingField.class);
-        if (sf != null && sf.ignored()) return true;
-
-        return false;
+        return sf != null && sf.ignored();
     }
 }

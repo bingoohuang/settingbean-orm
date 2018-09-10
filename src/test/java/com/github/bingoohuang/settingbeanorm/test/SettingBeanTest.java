@@ -1,12 +1,13 @@
 package com.github.bingoohuang.settingbeanorm.test;
 
-
 import com.github.bingoohuang.settingbeanorm.SettingItem;
+import com.github.bingoohuang.settingbeanorm.SettingUpdateEvent;
 import com.github.bingoohuang.settingbeanorm.SpringConfig;
 import com.github.bingoohuang.settingbeanorm.spring.SettingService;
 import com.github.bingoohuang.settingbeanorm.util.BusinessTime;
 import com.github.bingoohuang.settingbeanorm.xyz.XyzSetting;
 import com.google.common.collect.Lists;
+import com.google.common.eventbus.Subscribe;
 import lombok.val;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -46,7 +47,6 @@ public class SettingBeanTest {
 
     @Autowired SettingService settingService;
 
-
     @Test
     public void cache() {
         XyzSetting settings = settingService.getSettingBean();
@@ -70,7 +70,18 @@ public class SettingBeanTest {
 
         setting.setMaxSubscribesPerMember(11);
         setting.setAllowQueuing(false);
+
+        SettingUpdateReceiver receiver = new SettingUpdateReceiver();
+        settingService.registerSettingUpdate(receiver);
+
         settingService.updateSettings(setting);
+
+        assertThat(receiver.event.getOldSettingBbean().getMaxSubscribesPerMember()).isEqualTo(10);
+        assertThat(receiver.event.getNewSettingBean().getMaxSubscribesPerMember()).isEqualTo(11);
+        assertThat(receiver.event.getOldSettingBbean().isAllowQueuing()).isTrue();
+        assertThat(receiver.event.getNewSettingBean().isAllowQueuing()).isFalse();
+
+        settingService.unregisterSettingChange(receiver);
 
         XyzSetting setting2 = settingService.getSettingBean();
         other.setMaxSubscribesPerMember(11);
@@ -99,6 +110,7 @@ public class SettingBeanTest {
         assertThat(SettingsItems).containsAllOf(item1, item2);
 
         item1.setValue("12");
+
         settingService.updateSettings(Lists.newArrayList(item1));
 
         XyzSetting Settings3 = settingService.getSettingBean();
@@ -106,5 +118,14 @@ public class SettingBeanTest {
         assertThat(Settings3.getXx()).isEqualTo(100);
         assertThat(Settings3.getCancelSubscriptionMinBeforeMinutes()).isEqualTo(30);
         assertThat(Settings3.getCancelSubscriptionMinBeforeReadable()).isEqualTo("30分钟");
+    }
+
+    public static class SettingUpdateReceiver {
+        SettingUpdateEvent<XyzSetting> event;
+
+        @Subscribe
+        public void subscribe(SettingUpdateEvent<XyzSetting> event) {
+            this.event = event;
+        }
     }
 }

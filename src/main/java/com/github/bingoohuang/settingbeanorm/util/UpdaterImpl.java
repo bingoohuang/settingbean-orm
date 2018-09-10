@@ -4,6 +4,7 @@ import com.github.bingoohuang.settingbeanorm.SettingItem;
 import com.github.bingoohuang.settingbeanorm.spring.SettingBeanDao;
 import com.github.bingoohuang.settingbeanorm.validator.ValueValidatorSpec;
 import com.google.common.collect.Lists;
+import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.apache.commons.lang3.StringUtils;
@@ -19,8 +20,8 @@ import static com.github.bingoohuang.settingbeanorm.util.SettingUtil.firstNoneEm
 
 public class UpdaterImpl {
     private final Map<String, SettingItem> settingsItems;
-    private final List<SettingItem> changes = Lists.newArrayList();
-    private final List<SettingItem> news = Lists.newArrayList();
+    @Getter private final List<SettingItem> changes = Lists.newArrayList();
+    @Getter private final List<SettingItem> news = Lists.newArrayList();
     private final String settingTable;
     private final SettingBeanDao settingBeanDao;
 
