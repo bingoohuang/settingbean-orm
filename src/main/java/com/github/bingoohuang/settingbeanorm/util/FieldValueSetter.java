@@ -1,6 +1,8 @@
 package com.github.bingoohuang.settingbeanorm.util;
 
 import com.github.bingoohuang.settingbeanorm.SettingValueFormat;
+import com.github.bingoohuang.utils.json.Jsons;
+import com.github.bingoohuang.utils.lang.Str;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import lombok.SneakyThrows;
@@ -37,12 +39,7 @@ public class FieldValueSetter {
     }};
 
     public static boolean parseBoolean(String s) {
-        return s != null && (s.equalsIgnoreCase("true")
-                || s.equals("1")
-                || s.equalsIgnoreCase("y")
-                || s.equalsIgnoreCase("t")
-                || s.equalsIgnoreCase("yes")
-                || s.equalsIgnoreCase("on"));
+        return s != null && Str.anyOfIgnoreCase(s, "true", "1", "y", "t", "yes", "on");
     }
 
     public static String valueOfString(String s) {
@@ -129,10 +126,10 @@ public class FieldValueSetter {
         checkTypeList(field);
         val values = Splitter.on(',').omitEmptyStrings().trimResults().splitToList(value);
 
-        val argClas = parseListArgType(field);
-        if (argClas == String.class) return values;
+        val argClass = parseListArgType(field);
+        if (argClass == String.class) return values;
 
-        val fun = parser.get(argClas);
+        val fun = parser.get(argClass);
         return fun == null ? values : values.stream().map(fun).collect(Collectors.toList());
     }
 
@@ -167,9 +164,8 @@ public class FieldValueSetter {
         }
     }
 
-    public static String fieldToString(
-            Field field, Object fieldValue,
-            SettingValueFormat format, TimeUnit unit) {
+    public static String fieldToString(Field field, Object fieldValue,
+                                       SettingValueFormat format, TimeUnit unit) {
         if (fieldValue == null) return null;
 
         switch (format) {
@@ -193,8 +189,6 @@ public class FieldValueSetter {
 
     private static String fieldToString(Field field, Object fieldValue) {
         val func = parser.get(field.getType());
-        if (func != null) return fieldValue.toString();
-
-        return Jsons.json(fieldValue);
+        return func != null ? fieldValue.toString() : Jsons.json(fieldValue);
     }
 }

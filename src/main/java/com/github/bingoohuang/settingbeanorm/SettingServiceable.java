@@ -20,6 +20,7 @@ public abstract class SettingServiceable {
     /**
      * 获取配置（用于业务逻辑判断）。
      *
+     * @param <T> JavaBean的类型
      * @return 配置JavaBean
      */
     protected abstract <T> T getSettingBean();

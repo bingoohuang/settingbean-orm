@@ -3,6 +3,8 @@ package com.github.bingoohuang.settingbeanorm.util;
 import com.github.bingoohuang.settingbeanorm.SettingItem;
 import com.github.bingoohuang.settingbeanorm.spring.SettingBeanDao;
 import com.github.bingoohuang.settingbeanorm.validator.ValueValidatorSpec;
+import com.github.bingoohuang.utils.lang.Str;
+import com.github.bingoohuang.utils.reflect.Fields;
 import com.google.common.collect.Lists;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -16,7 +18,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.github.bingoohuang.settingbeanorm.util.FieldValueSetter.fieldToString;
-import static com.github.bingoohuang.settingbeanorm.util.SettingUtil.firstNoneEmpty;
 
 public class UpdaterImpl {
     private final Map<String, SettingItem> settingsItems;
@@ -47,11 +48,11 @@ public class UpdaterImpl {
         for (val f : settingBean.getClass().getDeclaredFields()) {
             if (SettingUtil.isIgnored(f)) continue;
 
-            if (!f.isAccessible()) f.setAccessible(true);
+            Fields.setAccessible(f);
 
             val sf = SettingUtil.getSettingField(f);
-            val settingName = firstNoneEmpty(sf.name(), sf.value(), f.getName());
-            val settingTitle = firstNoneEmpty(sf.title(), settingName);
+            val settingName = Str.firstNoneEmpty(sf.name(), sf.value(), f.getName());
+            val settingTitle = Str.firstNoneEmpty(sf.title(), settingName);
             val settingValue = fieldToString(f, f.get(settingBean), sf.format(), sf.timeUnit());
             detectChanged(settingsItems.get(settingName), settingName, settingValue, settingTitle);
         }
