@@ -30,7 +30,7 @@ public class UpdaterImpl {
         this.settingTable = settingTable;
         this.settingBeanDao = settingBeanDao;
         this.settingsItems = settingBeanDao.querySettingItems(settingTable).stream()
-                .collect(Collectors.toMap(x -> x.getName(), x -> x));
+                .collect(Collectors.toMap(SettingItem::getName, x -> x));
 
     }
 

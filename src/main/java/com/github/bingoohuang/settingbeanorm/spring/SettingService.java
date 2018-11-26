@@ -1,8 +1,8 @@
 package com.github.bingoohuang.settingbeanorm.spring;
 
 import com.github.bingoohuang.settingbeanorm.SettingServiceable;
+import com.github.bingoohuang.utils.lang.Classpath;
 import com.github.bingoohuang.utils.lang.Clz;
-import com.github.bingoohuang.utils.lang.ClzPath;
 import com.github.bingoohuang.westcache.WestCacheable;
 import com.github.bingoohuang.westcache.utils.WestCacheConnector;
 import lombok.SneakyThrows;
@@ -14,7 +14,6 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.Properties;
 
 @Component
 public class SettingService extends SettingServiceable implements ApplicationContextAware {
@@ -26,9 +25,7 @@ public class SettingService extends SettingServiceable implements ApplicationCon
 
     @PostConstruct @SneakyThrows
     public void postConstruct() {
-        val is = ClzPath.toInputStream("settingbean-orm.properties");
-        val p = new Properties();
-        p.load(is);
+        val p = Classpath.loadProperties("settingbean-orm.properties");
 
         val beanClassName = p.getProperty("BeanClass");
         this.beanClass = Clz.findClass(beanClassName);
@@ -56,6 +53,7 @@ public class SettingService extends SettingServiceable implements ApplicationCon
         appContext.getBean(SettingServiceClearCache.class).clearSettingsCache();
     }
 
+    @SuppressWarnings("unchecked")
     @WestCacheable(manager = "redis")
     @Override public <T> T getSettingBean() {
         return (T) getUncachedSettingBean();

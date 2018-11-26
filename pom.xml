@@ -6,7 +6,7 @@
 
     <groupId>com.github.bingoohuang</groupId>
     <artifactId>settingbean-orm</artifactId>
-    <version>0.0.8-SNAPSHOT</version>
+    <version>0.0.9-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>settingbean-orm</name>
@@ -44,6 +44,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>joor-java-8</artifactId>
+            <version>0.9.9</version>
+        </dependency>
+        <dependency>
             <groupId>com.github.bingoohuang</groupId>
             <artifactId>westcache</artifactId>
             <version>0.0.32</version>
@@ -52,7 +57,7 @@
         <dependency>
             <groupId>com.github.bingoohuang</groupId>
             <artifactId>java-utils</artifactId>
-            <version>0.0.12</version>
+            <version>0.0.20</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

@@ -3,10 +3,10 @@ package com.github.bingoohuang.settingbeanorm.util;
 import com.github.bingoohuang.settingbeanorm.SettingField;
 import com.github.bingoohuang.settingbeanorm.SettingItem;
 import com.github.bingoohuang.settingbeanorm.SettingValueFormat;
-import com.github.bingoohuang.utils.joor.Reflect;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.commons.lang3.StringUtils;
+import org.joor.Reflect;
 import org.n3r.eql.base.AfterPropertiesSet;
 
 import java.lang.annotation.Annotation;
@@ -64,7 +64,7 @@ public class SettingUtil {
     }
 
     public static <T> T populateBean(Class<T> beanClass, List<SettingItem> items) {
-        val map = items.stream().collect(Collectors.toMap(x -> x.getName(), x -> x));
+        val map = items.stream().collect(Collectors.toMap(SettingItem::getName, x -> x));
         T bean = Reflect.on(beanClass).create().get();
         for (val f : beanClass.getDeclaredFields()) {
             if (SettingUtil.isIgnored(f)) continue;

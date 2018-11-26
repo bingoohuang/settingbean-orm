@@ -49,9 +49,8 @@ public class FieldValueSetter {
         return s;
     }
 
-    private static Object parseFieldValue(
-            Field field, String value,
-            SettingValueFormat format, TimeUnit timeUnit) {
+    private static Object parseFieldValue(Field field, String value,
+                                          SettingValueFormat format, TimeUnit timeUnit) {
         switch (format) {
             case SimpleList:
                 return parseSimpleList(field, value);
@@ -67,9 +66,9 @@ public class FieldValueSetter {
 
     private static Object convertNumberType(long l, Field field) {
         val type = field.getType();
-        if (type == Long.class || type == long.class) return Long.valueOf(l);
-        if (type == Integer.class || type == int.class) return Integer.valueOf((int) l);
-        if (type == Short.class || type == short.class) return Short.valueOf((short) l);
+        if (type == Long.class || type == long.class) return l;
+        if (type == Integer.class || type == int.class) return (int) l;
+        if (type == Short.class || type == short.class) return (short) l;
 
         throw new RuntimeException("unsupported field number type for " + field);
     }
@@ -134,7 +133,7 @@ public class FieldValueSetter {
         if (argClas == String.class) return values;
 
         val fun = parser.get(argClas);
-        return fun != null ? values : values.stream().map(fun).collect(Collectors.toList());
+        return fun == null ? values : values.stream().map(fun).collect(Collectors.toList());
     }
 
     private static Class<?> parseListArgType(Field field) {

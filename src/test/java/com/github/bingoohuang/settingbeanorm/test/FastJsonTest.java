@@ -3,7 +3,7 @@ package com.github.bingoohuang.settingbeanorm.test;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.parser.ParserConfig;
 import com.alibaba.fastjson.serializer.ValueFilter;
-import com.github.bingoohuang.settingbeanorm.util.JsonJodaDeserializer;
+import com.github.bingoohuang.utils.joda.JodaDateTimeDeserializer;
 import lombok.Data;
 import org.joda.time.DateTime;
 import org.junit.Test;
@@ -48,7 +48,7 @@ public class FastJsonTest {
     @Test
     public void testDateTime() {
         ParserConfig parserConfig = new ParserConfig();
-        parserConfig.putDeserializer(DateTime.class, new JsonJodaDeserializer("yyyy-MM-dd HH:mm:ss.SSS", "yyyy.MM.dd HH:mm:ss.SSS"));
+        parserConfig.putDeserializer(DateTime.class, new JodaDateTimeDeserializer("yyyy-MM-dd HH:mm:ss.SSS", "yyyy.MM.dd HH:mm:ss.SSS"));
 
         TimeBean o = JSON.parseObject("{\"time\":\"2018.05.25\"}", TimeBean.class, parserConfig, JSON.DEFAULT_PARSER_FEATURE);
 

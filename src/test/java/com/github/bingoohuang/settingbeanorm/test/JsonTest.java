@@ -3,8 +3,8 @@ package com.github.bingoohuang.settingbeanorm.test;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.parser.ParserConfig;
 import com.alibaba.fastjson.serializer.SerializeConfig;
-import com.github.bingoohuang.settingbeanorm.util.JsonJodaDeserializer;
-import com.github.bingoohuang.settingbeanorm.util.JsonJodaSerializer;
+import com.github.bingoohuang.utils.joda.JodaDateTimeDeserializer;
+import com.github.bingoohuang.utils.joda.JodaDateTimeSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,7 +19,7 @@ public class JsonTest {
     @Test
     public void testSerialize1() {
         val config = new SerializeConfig();
-        config.put(DateTime.class, new JsonJodaSerializer());
+        config.put(DateTime.class, new JodaDateTimeSerializer("yyyy-MM-dd HH:mm:ss.SSS", false));
 
         String time = "2018-07-26 11:38:57.123";
         val dt = DateTime.parse(time, DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"));
@@ -32,7 +32,7 @@ public class JsonTest {
     public void testSerialize2() {
         val config = new SerializeConfig();
         String pattern = "yyyy-MM-dd HH:mm:ss";
-        config.put(DateTime.class, new JsonJodaSerializer(pattern, false));
+        config.put(DateTime.class, new JodaDateTimeSerializer(pattern, false));
 
         String time = "2018-07-26 11:38:57";
         val dt = DateTime.parse(time, DateTimeFormat.forPattern(pattern));
@@ -45,7 +45,7 @@ public class JsonTest {
     public void testSerialize3() {
         val config = new SerializeConfig();
         String pattern = "yyyy-MM-dd HH:mm:ss";
-        config.put(DateTime.class, new JsonJodaSerializer("", true));
+        config.put(DateTime.class, new JodaDateTimeSerializer(pattern, true, true));
 
         String time = "2018-07-26 11:38:57";
         val dt = DateTime.parse(time, DateTimeFormat.forPattern(pattern));
@@ -62,7 +62,8 @@ public class JsonTest {
     @Test
     public void testSerializeNull1() {
         val config = new SerializeConfig();
-        config.put(DateTime.class, new JsonJodaSerializer("", true));
+        String pattern = "yyyy-MM-dd HH:mm:ss";
+        config.put(DateTime.class, new JodaDateTimeSerializer(pattern, true));
 
         String json = JSON.toJSONString(new DateTimeBean(null), config);
         assertThat(json).isEqualTo("{}");
@@ -72,7 +73,7 @@ public class JsonTest {
     @Test
     public void testDeserialize1() {
         val config = new ParserConfig();
-        config.putDeserializer(DateTime.class, new JsonJodaDeserializer("yyyy-MM-dd HH:mm:ss.SSS", "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd"));
+        config.putDeserializer(DateTime.class, new JodaDateTimeDeserializer("yyyy-MM-dd HH:mm:ss.SSS", "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd"));
         String time = "2018-07-26 11:38:57";
         String pattern = "yyyy-MM-dd HH:mm:ss";
         val dt1 = DateTime.parse(time, DateTimeFormat.forPattern(pattern));

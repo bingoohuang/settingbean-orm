@@ -19,6 +19,8 @@ public abstract class SettingServiceable {
 
     /**
      * 获取配置（用于业务逻辑判断）。
+     *
+     * @return 配置JavaBean
      */
     protected abstract <T> T getSettingBean();
 
@@ -41,6 +43,8 @@ public abstract class SettingServiceable {
 
     /**
      * 获取配置项列表（用于配置页面）
+     *
+     * @return 配置项列表
      */
     public List<SettingItem> getSettingsItems() {
         return getSettingBeanDao().querySettingItems(getSettingTable());
@@ -48,7 +52,10 @@ public abstract class SettingServiceable {
 
     /**
      * 更新配置。（适合直接单项配置的更新）
+     *
+     * @param settingBean 配置JavaBean
      */
+    @SuppressWarnings("unchecked")
     public void updateSettings(Object settingBean) {
         String settingTable = getSettingTable();
         val updater = new UpdaterImpl(getSettingBeanDao(), settingTable);
@@ -63,6 +70,8 @@ public abstract class SettingServiceable {
 
     /**
      * 更新配置。（适合从页面上多项配置同时更新）
+     *
+     * @param changes 更新项目列表
      */
     public void updateSettings(List<SettingItem> changes) {
         String settingTable = getSettingTable();
